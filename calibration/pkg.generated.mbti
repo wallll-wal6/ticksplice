@@ -40,8 +40,10 @@ pub struct ClockMap {
   last : Int64
   offset_only : Bool
 }
+pub fn ClockMap::coverage(Self) -> (Int64, Int64)
 pub fn ClockMap::drift_ppm(Self) -> Double?
 pub fn ClockMap::is_extrapolated(Self, Int64) -> Bool
+pub fn ClockMap::offset_at_coverage_start_us(Self) -> Double
 pub fn ClockMap::project(Self, Int64) -> Int64 raise FitError
 
 pub struct Evidence {
