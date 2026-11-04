@@ -16,8 +16,8 @@ fn summarize(errors : Array[Double]) -> Json {
     errors[middle]
   }
   {
-    "median_absolute_us": median.to_json(),
-    "max_absolute_us": errors[count - 1].to_json(),
+    "median_absolute_us": Json::number(median),
+    "max_absolute_us": Json::number(errors[count - 1]),
   }
 }
 
@@ -55,8 +55,8 @@ fn score(
     }
   }
   {
-    "events": holdout.length().to_json(),
-    "extrapolated_events": extrapolated.to_json(),
+    "events": Json::number(holdout.length().to_double()),
+    "extrapolated_events": Json::number(extrapolated.to_double()),
     "offset_only": summarize(baseline),
     "calibrated": summarize(calibrated),
   }
