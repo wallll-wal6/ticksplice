@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 112" role="img" aria-labelledby="title">
+  <title id="title">TickSplice, two timelines joined at a sync event</title>
+  <rect width="520" height="112" rx="12" fill="#112327"/>
+  <g fill="none" stroke="#79ded2" stroke-width="3" stroke-linecap="round">
+    <path d="M27 43h70l23 14h54M27 73h54l39-16"/>
+    <path d="M34 36v7m21-7v7m21-7v7M34 73v7m17-7v7m17-7v7m73-23v7m16-7v7"/>
+  </g>
+  <circle cx="120" cy="57" r="5" fill="#ffab69"/>
+  <text x="198" y="68" fill="#e6fffb" font-family="system-ui,sans-serif" font-size="37" font-weight="700">TickSplice</text>
+</svg>
