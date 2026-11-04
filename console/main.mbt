@@ -3,8 +3,9 @@ let usage : String =
   #|TickSplice · 时缝
   #|  audit ANCHORS.csv [TOLERANCE_US]
   #|  apply ANCHORS.csv CAPTURE.csv [TOLERANCE_US]
+  #|  score ANCHORS.csv HOLDOUT.csv [TOLERANCE_US]
   #|Default residual tolerance is 1000 microseconds.
-  #|audit writes JSON and apply writes CSV to standard output.
+  #|audit and score write JSON. apply writes CSV to standard output.
 
 ///|
 extern "js" fn stderr(message : String) -> Unit =
@@ -42,6 +43,15 @@ fn run(args : ArrayView[String]) -> Unit raise {
         tolerance_us=tolerance,
       )
       stdout(project_capture(@fs.read_file_to_string(capture), result.clock))
+    }
+    ["score", anchors, holdout, .. rest] => {
+      let tolerance = tolerance_arg(rest)
+      let result = @calibration.calibrate(
+        read_anchors(@fs.read_file_to_string(anchors)),
+        tolerance_us=tolerance,
+      )
+      let report = score(result, read_anchors(@fs.read_file_to_string(holdout)))
+      println(report.stringify())
     }
     _ => raise BadArguments
   }

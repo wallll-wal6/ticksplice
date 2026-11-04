@@ -1,0 +1,8 @@
+device_us,signal,note
+0,0.03,first sync
+5000000,0.84,validation pulse
+25000000,0.79,validation pulse
+40000000,0.86,mispaired event in fit.csv
+55000000,0.82,validation pulse
+75000000,0.85,validation pulse
+90000000,0.80,beyond fit coverage
