@@ -31,7 +31,7 @@ fn run(args : ArrayView[String]) -> Unit raise {
     ["audit", path, .. rest] => {
       let tolerance = tolerance_arg(rest)
       let result = @calibration.calibrate(
-        read_anchors(@fs.read_file_to_string(path)),
+        read_anchors(read_input(path)),
         tolerance_us=tolerance,
       )
       println(audit(result, tolerance).stringify())
@@ -39,18 +39,18 @@ fn run(args : ArrayView[String]) -> Unit raise {
     ["apply", anchors, capture, .. rest] => {
       let tolerance = tolerance_arg(rest)
       let result = @calibration.calibrate(
-        read_anchors(@fs.read_file_to_string(anchors)),
+        read_anchors(read_input(anchors)),
         tolerance_us=tolerance,
       )
-      stdout(project_capture(@fs.read_file_to_string(capture), result.clock))
+      stdout(project_capture(read_input(capture), result.clock))
     }
     ["score", anchors, holdout, .. rest] => {
       let tolerance = tolerance_arg(rest)
       let result = @calibration.calibrate(
-        read_anchors(@fs.read_file_to_string(anchors)),
+        read_anchors(read_input(anchors)),
         tolerance_us=tolerance,
       )
-      let report = score(result, read_anchors(@fs.read_file_to_string(holdout)))
+      let report = score(result, read_anchors(read_input(holdout)))
       println(report.stringify())
     }
     _ => raise BadArguments
@@ -60,6 +60,6 @@ fn run(args : ArrayView[String]) -> Unit raise {
 ///|
 fn main {
   run(@env.args()[2:]) catch {
-    error => stderr("ticksplice: \{error}")
+    error => stderr("ticksplice: \{diagnostic(error)}")
   }
 }

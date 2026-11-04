@@ -14,6 +14,7 @@ suberror InputError {
   BadWidth(Int)
   BadTolerance
   BadArguments
+  UnreadableInput(String)
 } derive(Debug)
 
 ///|
