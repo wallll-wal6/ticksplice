@@ -1,7 +1,7 @@
 ///|
 fn timestamp(
   text : String,
-  record : Int,
+  record : Int32,
   column : String,
 ) -> Int64 raise InputError {
   guard !text.is_empty() else { raise BadTimestamp(record, column) }

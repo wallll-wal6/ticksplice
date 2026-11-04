@@ -8,10 +8,10 @@ priv enum FieldState {
 
 ///|
 suberror InputError {
-  BadCsv(Int, String)
-  BadTimestamp(Int, String)
+  BadCsv(Int32, String)
+  BadTimestamp(Int32, String)
   BadHeader(String)
-  BadWidth(Int)
+  BadWidth(Int32)
   BadTolerance
   BadArguments
   UnreadableInput(String)

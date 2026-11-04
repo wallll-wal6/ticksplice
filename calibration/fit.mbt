@@ -54,7 +54,7 @@ fn least_squares(samples : Array[Sample]) -> (Double, Double) {
 /// The tolerance is the maximum accepted absolute residual in microseconds.
 pub fn calibrate(
   anchors : ArrayView[Anchor],
-  tolerance_us? : Double = 1000.0,
+  tolerance_us~ : Double = 1000.0,
 ) -> Calibration raise FitError {
   guard tolerance_us > 0.0 && tolerance_us <= max_timestamp.to_double() else {
     raise InvalidTolerance
