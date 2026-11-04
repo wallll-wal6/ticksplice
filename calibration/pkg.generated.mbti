@@ -1,0 +1,55 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "wallll-wal6/ticksplice/calibration"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn calibrate(ArrayView[Anchor], tolerance_us? : Double) -> Calibration raise FitError
+
+// Errors
+pub suberror FitError {
+  InvalidTimestamp
+  InvalidTolerance
+  MissingAnchors
+  TooManyAnchors
+  DuplicateDeviceTime(Int64)
+  NoConsensus
+  NonMonotonicClock
+  ProjectionOutOfRange
+} derive(@debug.Debug)
+
+// Types and methods
+pub(all) struct Anchor {
+  device_us : Int64
+  reference_us : Int64
+}
+
+pub struct Calibration {
+  clock : ClockMap
+  evidence : ReadOnlyArray[Evidence]
+}
+
+pub struct ClockMap {
+  device_origin : Int64
+  reference_origin : Int64
+  intercept : Double
+  rate : Double
+  first : Int64
+  last : Int64
+  offset_only : Bool
+}
+pub fn ClockMap::drift_ppm(Self) -> Double?
+pub fn ClockMap::is_extrapolated(Self, Int64) -> Bool
+pub fn ClockMap::project(Self, Int64) -> Int64 raise FitError
+
+pub struct Evidence {
+  anchor : Anchor
+  residual_us : Double
+  accepted : Bool
+}
+
+// Type aliases
+
+// Traits
