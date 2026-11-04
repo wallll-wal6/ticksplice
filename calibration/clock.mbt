@@ -15,7 +15,7 @@ pub suberror FitError {
   NoConsensus
   NonMonotonicClock
   ProjectionOutOfRange
-} derive(Debug)
+}
 
 ///|
 pub struct ClockMap {

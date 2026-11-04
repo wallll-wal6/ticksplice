@@ -15,7 +15,7 @@ suberror InputError {
   BadTolerance
   BadArguments
   UnreadableInput(String)
-} derive(Debug)
+}
 
 ///|
 // Read UTF-8 CSV with optional BOM, escaped quotes, and LF or CRLF records.

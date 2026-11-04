@@ -1,10 +1,6 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "wallll-wal6/ticksplice/calibration"
 
-import {
-  "moonbitlang/core/debug",
-}
-
 // Values
 pub fn calibrate(ArrayView[Anchor], tolerance_us? : Double) -> Calibration raise FitError
 
@@ -18,7 +14,7 @@ pub suberror FitError {
   NoConsensus
   NonMonotonicClock
   ProjectionOutOfRange
-} derive(@debug.Debug)
+}
 
 // Types and methods
 pub(all) struct Anchor {

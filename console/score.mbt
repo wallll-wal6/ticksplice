@@ -3,7 +3,7 @@ suberror ScoreError {
   EmptyHoldout
   MissingBaseline
   OverlappingHoldout(Int64)
-} derive(Debug)
+}
 
 ///|
 fn summarize(errors : Array[Double]) -> Json {
