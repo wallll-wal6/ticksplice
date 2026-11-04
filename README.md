@@ -13,6 +13,7 @@
 准备 [MoonBit](https://www.moonbitlang.cn/download/) 与 Node.js 22 或更新版本。以下命令在仓库根目录执行。先审计拟合，再生成校准记录，最后用留出事件比较误差。
 
 ```sh
+moon update
 moon run console --target js -- audit captures/bench-pulse/fit.csv 100
 moon run console --target js -- apply captures/bench-pulse/fit.csv captures/bench-pulse/device.csv 100
 moon run console --target js -- score captures/bench-pulse/fit.csv captures/bench-pulse/holdout.csv 100
