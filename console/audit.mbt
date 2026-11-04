@@ -22,6 +22,9 @@ fn audit(result : @calibration.Calibration, tolerance : Double) -> Json {
       None => Json::null()
     },
     "tolerance_us": Json::number(tolerance),
+    "coverage_span_us": Json::number(
+      result.clock.coverage_span_us().to_double(),
+    ),
     "coverage_device_us": [
       Json::number(first.to_double()),
       Json::number(last.to_double()),

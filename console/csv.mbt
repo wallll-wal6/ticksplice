@@ -13,6 +13,7 @@ suberror InputError {
   BadHeader(String)
   BadWidth(Int32)
   BadTolerance
+  BadMinimumSpan
   BadArguments
   UnreadableInput(String)
 }

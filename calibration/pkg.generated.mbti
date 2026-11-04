@@ -2,12 +2,14 @@
 package "wallll-wal6/ticksplice/calibration"
 
 // Values
-pub fn calibrate(ArrayView[Anchor], tolerance_us? : Double) -> Calibration raise FitError
+pub fn calibrate(ArrayView[Anchor], tolerance_us? : Double, min_span_us? : Int64) -> Calibration raise FitError
 
 // Errors
 pub suberror FitError {
   InvalidTimestamp
   InvalidTolerance
+  InvalidMinimumSpan
+  InsufficientSpan(Int64, Int64)
   MissingAnchors
   TooManyAnchors
   DuplicateDeviceTime(Int64)
@@ -37,6 +39,7 @@ pub struct ClockMap {
   offset_only : Bool
 }
 pub fn ClockMap::coverage(Self) -> (Int64, Int64)
+pub fn ClockMap::coverage_span_us(Self) -> Int64
 pub fn ClockMap::drift_ppm(Self) -> Double?
 pub fn ClockMap::is_extrapolated(Self, Int64) -> Bool
 pub fn ClockMap::offset_at_coverage_start_us(Self) -> Double

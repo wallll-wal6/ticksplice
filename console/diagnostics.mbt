@@ -22,6 +22,10 @@ fn diagnostic(error : Error) -> String {
     MissingBaseline => "the fit has no accepted anchor for the offset baseline"
     OverlappingHoldout(device) =>
       "device timestamp \{device} appears more than once across the fit and holdout inputs"
+    BadMinimumSpan | @calibration.InvalidMinimumSpan =>
+      "minimum span must be a nonnegative integer in the supported microsecond range"
+    @calibration.InsufficientSpan(actual, minimum) =>
+      "accepted anchor span is \{actual} us; required at least \{minimum} us"
     @calibration.MissingAnchors => "the anchor file has no events"
     @calibration.TooManyAnchors => "at most 256 anchors are supported"
     @calibration.DuplicateDeviceTime(device) =>

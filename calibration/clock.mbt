@@ -9,6 +9,8 @@ pub(all) struct Anchor {
 pub suberror FitError {
   InvalidTimestamp
   InvalidTolerance
+  InvalidMinimumSpan
+  InsufficientSpan(Int64, Int64)
   MissingAnchors
   TooManyAnchors
   DuplicateDeviceTime(Int64)

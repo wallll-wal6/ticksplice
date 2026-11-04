@@ -55,10 +55,12 @@ fn least_squares(samples : Array[Sample]) -> (Double, Double) {
 pub fn calibrate(
   anchors : ArrayView[Anchor],
   tolerance_us~ : Double = 1000.0,
+  min_span_us~ : Int64 = 0L,
 ) -> Calibration raise FitError {
   guard tolerance_us > 0.0 && tolerance_us <= max_timestamp.to_double() else {
     raise InvalidTolerance
   }
+  guard valid_timestamp(min_span_us) else { raise InvalidMinimumSpan }
   let count = anchors.length()
   guard count > 0 else { raise MissingAnchors }
   guard count <= 256 else { raise TooManyAnchors }
@@ -75,6 +77,9 @@ pub fn calibrate(
   }
   let origin = ordered[0]
   if count == 1 {
+    if min_span_us > 0L {
+      raise InsufficientSpan(0L, min_span_us)
+    }
     return {
       clock: {
         device_origin: origin.device_us,
@@ -125,6 +130,8 @@ pub fn calibrate(
     })
   }
   guard accepted >= 2 && accepted > count / 2 else { raise NoConsensus }
+  let span = last - first
+  guard span >= min_span_us else { raise InsufficientSpan(span, min_span_us) }
   {
     clock: {
       device_origin: origin.device_us,
