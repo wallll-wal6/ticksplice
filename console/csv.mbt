@@ -16,6 +16,7 @@ suberror InputError {
   BadMinimumSpan
   BadArguments
   UnreadableInput(String)
+  InvalidUtf8
 }
 
 ///|

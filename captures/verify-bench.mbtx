@@ -91,7 +91,66 @@ async fn main {
   guard reject_code == 1 && output.is_empty() else {
     fail("an insufficient span must exit 1 without a JSON report")
   }
+
+  let logger = report(["audit", "captures/logger-pair/fit.csv", "100"])
+  guard logger is { "drift_ppm": Number(logger_ppm, ..), .. } &&
+    (logger_ppm + 500.0).abs() < 0.001 else {
+    fail("logger-pair must recover negative drift")
+  }
+  let (logger_code, logger_rows) = replay([
+    "apply", "captures/logger-pair/fit.csv", "captures/logger-pair/device.csv", "100",
+  ])
+  guard logger_code == 0 &&
+    logger_rows.length() == 4 &&
+    logger_rows[2] == "\"15000000\",\"21.8\",\"15092500\",\"false\"" &&
+    logger_rows[3] == "\"45000000\",\"22.1\",\"45077500\",\"true\"" else {
+    fail("logger-pair projection or extrapolation changed")
+  }
+  let logger_score = report([
+    "score", "captures/logger-pair/fit.csv", "captures/logger-pair/holdout.csv",
+    "100",
+  ])
+  guard logger_score
+    is {
+      "events": 2,
+      "extrapolated_events": 1,
+      "calibrated": { "max_absolute_us": 0, .. },
+      ..
+    } else {
+    fail("logger-pair holdout error changed")
+  }
+
+  let session = report(["audit", "captures/session-offset/fit.csv"])
+  guard session
+    is {
+      "model": "offset",
+      "drift_ppm": Null,
+      "offset_at_coverage_start_us": 200000,
+      ..
+    } else {
+    fail("session-offset must expose an unknown drift")
+  }
+  let (session_code, session_rows) = replay([
+    "apply", "captures/session-offset/fit.csv", "captures/session-offset/device.csv",
+  ])
+  guard session_code == 0 &&
+    session_rows.length() == 4 &&
+    session_rows[2] == "\"2000000\",\"request\",\"2200000\",\"true\"" else {
+    fail("session-offset projection or extrapolation changed")
+  }
+  let session_score = report([
+    "score", "captures/session-offset/fit.csv", "captures/session-offset/holdout.csv",
+  ])
+  guard session_score
+    is {
+      "events": 2,
+      "extrapolated_events": 2,
+      "calibrated": { "max_absolute_us": 0, .. },
+      ..
+    } else {
+    fail("session-offset holdout error changed")
+  }
   println(
-    "Bench passed: drift, rejected anchor, holdout error, extrapolation and failure exit.",
+    "Three workflows passed: drift, rejected anchor, holdout error, extrapolation and failure exit.",
   )
 }

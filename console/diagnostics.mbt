@@ -1,7 +1,15 @@
 ///|
 fn read_input(path : String) -> String raise InputError {
-  @fs.read_file_to_string(path) catch {
+  let bytes = @fs.read_file_to_bytes(path) catch {
     _ => raise UnreadableInput(path)
+  }
+  decode_input(bytes)
+}
+
+///|
+fn decode_input(bytes : BytesView) -> String raise InputError {
+  @utf8.decode(bytes) catch {
+    _ => raise InvalidUtf8
   }
 }
 
@@ -18,6 +26,7 @@ fn diagnostic(error : Error) -> String {
     BadArguments =>
       "invalid arguments; use --help to see the available commands"
     UnreadableInput(path) => "cannot read input file: \{path}"
+    InvalidUtf8 => "input must be valid UTF-8; export the capture as UTF-8 CSV"
     EmptyHoldout => "the holdout file has no events"
     MissingBaseline => "the fit has no accepted anchor for the offset baseline"
     OverlappingHoldout(device) =>

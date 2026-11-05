@@ -34,4 +34,8 @@ jobs:
       - name: Assert the capture replay results
         run: moon run captures/verify-bench.mbtx --deny-warn
       - name: Check formatting
-        run: moon fmt --check
+        run: |
+          moon fmt --check
+          moon fmt captures/verify-bench.mbtx --check
+      - name: Verify publishable package contents
+        run: moon package --list

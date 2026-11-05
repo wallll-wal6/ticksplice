@@ -10,7 +10,7 @@
 
 ## 跑一次台架实验
 
-准备 [MoonBit](https://www.moonbitlang.cn/download/) 与 Node.js 22 或更新版本。以下命令在仓库根目录执行。先审计拟合，再生成校准记录，最后用留出事件比较误差。
+准备 [MoonBit](https://www.moonbitlang.cn/download/)（本轮验证版本为 moonc 0.10.19）与 Node.js 22 或更新版本。以下命令在仓库根目录执行。先审计拟合，再生成校准记录，最后用留出事件比较误差。
 
 ```sh
 moon update
@@ -34,7 +34,7 @@ moon run console --target js -- score captures/bench-pulse/fit.csv captures/benc
 - **同步事件表**使用 `device_us,reference_us` 两列，每条记录代表同一个物理事件在两个时钟上的读数。输入 1–256 条锚点，设备锚点时间须唯一。参考设备侧的对应事件时间直接写在这里。
 - **待校准记录表**的首列是 `device_us`，其余列按原有值和顺序保留。输出在右侧追加 `reference_us` 和 `extrapolated`。可用 shell 重定向将标准输出写到另一个文件。
 - **留出事件表**与同步事件表格式相同，设备时间不得与拟合锚点或其它留出事件重复。建议留出中段和末段的同步事件。固定偏移基线取最早保留锚点的参考时间与设备时间之差。
-- 文件为 UTF-8 CSV，时间使用十进制整数微秒，范围为 0 至 9007199254740991。支持带引号的字段、嵌入换行和双引号转义。采集记录可乱序，也可有同一设备时间的多条数据。
+- 文件使用严格 UTF-8 解码，非法编码将明确拒绝。CSV 时间使用十进制整数微秒，范围为 0 至 9007199254740991。支持带引号的字段、嵌入换行和双引号转义。采集记录可乱序，也可有同一设备时间的多条数据。
 - 末尾参数是允许的绝对残差，单位为微秒，默认 1000。输入或拟合出错时，诊断写入标准错误，进程退出码为 1。
 
 - 可在三个命令末尾加上 `--min-span-us N`，要求通过残差检查的首尾锚点至少相隔 N 微秒。省略时沿用原有行为。跨度不足时退出码为 1，并报告实际跨度和要求值。
@@ -44,6 +44,8 @@ moon run console --target js -- score captures/bench-pulse/fit.csv captures/benc
 `audit` 给出覆盖区间、覆盖时长（`coverage_span_us`）、覆盖起点偏移、漂移 ppm 和逐锚点残差。残差为观测参考时间减去预测参考时间。拟合以锚点时刻为原点，先用两两斜率的中位数估计初值，再以阈值内的锚点作中心化最小二乘拟合，最后重新检查残差。多锚点模式要求至少两个锚点通过且超过总数一半。只有一个锚点时只估计偏移，`drift_ppm` 为 `null`。
 
 首版覆盖一对设备的一段连续采集。锚点应横跨采集区间，并尽量保留独立验证事件。两个锚点可以拟合一条直线，检出错配则依赖额外锚点提供冗余。时钟重启或随温度出现明显非线性变化时，先按连续稳定段整理数据。输出的残差和覆盖标记可用于人工复核。
+
+三个场景的输入、输出和验收标准见[使用场景](captures/workflows.md)。库调用方法见[可执行 API 示例](calibration/README.mbt.md)。
 
 复验台架断言请运行 `moon run captures/verify-bench.mbtx --deny-warn`。
 
@@ -67,4 +69,6 @@ moon fmt --check
 代码采用 [MIT](LICENSE) 许可。命令行通过 [moonbitlang/x](https://github.com/moonbitlang/x) 读取文件。
 算法采用 Theil–Sen 斜率中位数与普通最小二乘。样例由本项目按公开公式构造。相近的 MoonBit 项目 [warpfit](https://github.com/JQ-ai-nb/warpfit) 处理可微时序对齐，本项目以配对同步事件校准设备时钟并记录证据。
 
-参赛材料见 [一页项目说明](SUBMISSION.md) 和 [初审提交清单](REVIEW.md)。
+参赛材料见 [申报事实素材](SUBMISSION.md) 和 [初审提交清单](REVIEW.md)。
+
+第三方许可、样例来源和同类比较见 [THIRD_PARTY.md](THIRD_PARTY.md)。
