@@ -69,6 +69,6 @@ moon fmt --check
 代码采用 [MIT](LICENSE) 许可。命令行通过 [moonbitlang/x](https://github.com/moonbitlang/x) 读取文件。
 算法采用 Theil–Sen 斜率中位数与普通最小二乘。样例由本项目按公开公式构造。相近的 MoonBit 项目 [warpfit](https://github.com/JQ-ai-nb/warpfit) 处理可微时序对齐，本项目以配对同步事件校准设备时钟并记录证据。
 
-参赛材料见 [申报事实素材](SUBMISSION.md) 和 [初审提交清单](REVIEW.md)。
+参赛材料见 [项目申报书](SUBMISSION.md) 和 [初审提交清单](REVIEW.md)。
 
 第三方许可、样例来源和同类比较见 [THIRD_PARTY.md](THIRD_PARTY.md)。
