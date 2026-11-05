@@ -31,10 +31,7 @@ jobs:
           moon check --target js --deny-warn
           moon test --target js --deny-warn
           moon build console --target js --release
-      - name: Replay the checked-in capture
-        run: |
-          moon run console --target js -- audit captures/bench-pulse/fit.csv 100
-          moon run console --target js -- apply captures/bench-pulse/fit.csv captures/bench-pulse/device.csv 100
-          moon run console --target js -- score captures/bench-pulse/fit.csv captures/bench-pulse/holdout.csv 100
+      - name: Assert the capture replay results
+        run: moon run captures/verify-bench.mbtx --deny-warn
       - name: Check formatting
         run: moon fmt --check

@@ -1,0 +1,97 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/json",
+}
+----
+
+///|
+async fn replay(args : Array[String]) -> (Int32, Array[String]) {
+  let lines = []
+  let code = @shell.Cmd(
+    "moon",
+    ["run", "console", "--target", "js", "--", ..args],
+  ).each_line(line => lines.push(line))
+  (code, lines)
+}
+
+///|
+async fn report(args : Array[String]) -> Json {
+  let (code, lines) = replay(args)
+  guard code == 0 && lines is [line] else {
+    fail("expected one JSON report from \{args[0]}")
+  }
+  @json.parse(line)
+}
+
+///|
+async fn main {
+  let fit = "captures/bench-pulse/fit.csv"
+  let audit = report(["audit", fit, "100", "--min-span-us", "80000000"])
+  guard audit
+    is {
+      "model": "affine",
+      "drift_ppm": Number(ppm, ..),
+      "coverage_span_us": 80000000,
+      "anchors": Array(anchors),
+      ..
+    } &&
+    (ppm - 500.0).abs() < 0.001 else {
+    fail("unexpected drift or coverage")
+  }
+  guard anchors.length() == 9 else { fail("expected nine fit anchors") }
+  for i, anchor in anchors {
+    if i == 4 {
+      guard anchor
+        is {
+          "device_us": 40000000,
+          "residual_us": 60000,
+          "accepted": false,
+          ..
+        } else {
+        fail("wrong anchor or residual reported for the deliberate mismatch")
+      }
+    } else {
+      guard anchor is { "accepted": true, .. } else {
+        fail("unexpected rejection of an inlier")
+      }
+    }
+  }
+
+  let score = report(["score", fit, "captures/bench-pulse/holdout.csv", "100"])
+  guard score
+    is {
+      "events": 5,
+      "extrapolated_events": 1,
+      "offset_only": {
+        "median_absolute_us": 27500,
+        "max_absolute_us": 45000,
+        ..
+      },
+      "calibrated": { "median_absolute_us": 0, "max_absolute_us": 0, .. },
+      ..
+    } else {
+    fail("unexpected holdout metrics")
+  }
+
+  let (apply_code, rows) = replay([
+    "apply", fit, "captures/bench-pulse/device.csv", "100",
+  ])
+  guard apply_code == 0 &&
+    rows.length() == 8 &&
+    rows[7] ==
+    "\"90000000\",\"0.80\",\"beyond fit coverage\",\"90295000\",\"true\"" else {
+    fail("missing extrapolated projection in the capture")
+  }
+
+  let (reject_code, output) = replay([
+    "audit", fit, "100", "--min-span-us", "80000001",
+  ])
+  guard reject_code == 1 && output.is_empty() else {
+    fail("an insufficient span must exit 1 without a JSON report")
+  }
+  println(
+    "Bench passed: drift, rejected anchor, holdout error, extrapolation and failure exit.",
+  )
+}

@@ -45,6 +45,8 @@ moon run console --target js -- score captures/bench-pulse/fit.csv captures/benc
 
 首版覆盖一对设备的一段连续采集。锚点应横跨采集区间，并尽量保留独立验证事件。两个锚点可以拟合一条直线，检出错配则依赖额外锚点提供冗余。时钟重启或随温度出现明显非线性变化时，先按连续稳定段整理数据。输出的残差和覆盖标记可用于人工复核。
 
+复验台架断言请运行 `moon run captures/verify-bench.mbtx --deny-warn`。
+
 ## 仓库地图
 
 | 路径 | 内容 |
@@ -64,3 +66,5 @@ moon fmt --check
 
 代码采用 [MIT](LICENSE) 许可。命令行通过 [moonbitlang/x](https://github.com/moonbitlang/x) 读取文件。
 算法采用 Theil–Sen 斜率中位数与普通最小二乘。样例由本项目按公开公式构造。相近的 MoonBit 项目 [warpfit](https://github.com/JQ-ai-nb/warpfit) 处理可微时序对齐，本项目以配对同步事件校准设备时钟并记录证据。
+
+参赛材料见 [一页项目说明](SUBMISSION.md) 和 [初审提交清单](REVIEW.md)。
