@@ -17,6 +17,7 @@ suberror InputError {
   BadArguments
   UnreadableInput(String)
   InvalidUtf8
+  NetworkConflict(Int32)
 }
 
 ///|

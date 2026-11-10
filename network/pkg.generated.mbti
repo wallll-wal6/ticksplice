@@ -1,0 +1,80 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "wallll-wal6/ticksplice/network"
+
+import {
+  "wallll-wal6/ticksplice/calibration",
+}
+
+// Values
+pub fn solve(String, ArrayView[Link], tolerance_us? : Double, cycle_tolerance_us? : Double) -> Network raise NetworkError
+
+// Errors
+pub suberror NetworkError {
+  InvalidClock(String)
+  MissingReference(String)
+  SelfLink(Int32)
+  TooManyLinks
+  TooManyClocks
+  OffsetOnlyLink(Int32)
+  LinkFitFailed(Int32, @calibration.FitError)
+  InvalidCycleTolerance
+  UnknownClock(String)
+  InvalidNetworkTimestamp
+  UnrepresentableTransform
+  InconsistentNetwork
+}
+
+// Types and methods
+pub struct CycleCheck {
+  link_id : Int32
+  status : CycleStatus
+  max_gap_us : Double?
+}
+
+pub(all) enum CycleStatus {
+  Consistent
+  Conflict
+  NoSharedCoverage
+}
+
+pub(all) struct Link {
+  source : String
+  target : String
+  anchors : Array[@calibration.Anchor]
+}
+
+pub struct LinkInfo {
+  id : Int32
+  source : String
+  target : String
+  retained : Int32
+  rejected : Int32
+  tree_edge : Bool
+}
+
+pub struct Network {
+  reference : String
+  routes : ReadOnlyArray[RouteInfo]
+  disconnected : ReadOnlyArray[String]
+  links : ReadOnlyArray[LinkInfo]
+  cycles : ReadOnlyArray[CycleCheck]
+  conflict_count : Int32
+  // private fields
+}
+pub fn Network::project(Self, String, Int64) -> Projection? raise NetworkError
+
+pub struct Projection {
+  reference_us : Int64
+  extrapolated : Bool
+}
+
+pub struct RouteInfo {
+  clock : String
+  path : ReadOnlyArray[String]
+  link_ids : ReadOnlyArray[Int32]
+  coverage_us : (Int64, Int64)?
+}
+
+// Type aliases
+
+// Traits

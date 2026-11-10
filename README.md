@@ -1,14 +1,33 @@
 <img src="captures/ticksplice.svg" width="420" alt="TickSplice">
 
-# 时缝
+# 时缝 ClockNet
 
 **把不同设备的时间缝回同一条线。**
 
-同一次实验里，两台设备各记各的时间。只在开始时对表，后半段仍可能逐渐错开。TickSplice 用共同观测到的同步事件估计偏移和漂移，将设备读数换算成参考时间。每个同步事件的残差都可以回查，锚点范围之外的换算结果会单独标记。
+时缝把离线采集中的设备时钟组织成图。每条边由两台设备会话的配对事件建立。即使传感器只和网关有共同事件，也能沿传感器 → 网关 → 参考仪器的路径换算时间。审计报告列出路径、链路编号、共同支持区间和无法对齐的设备。两条路径存在足够的共同证据时，程序会检查它们是否给出相符的参考时间。
 
-适用于实验室多设备采集、传感器离线回放和设备日志对齐。参考时钟可以是另一台设备的相对时间，双方无需使用同一个时间原点。
+## 从同步链到参考时间
 
-## 跑一次台架实验
+准备 [MoonBit](https://www.moonbitlang.cn/download/) 和 Node.js 22 或更新版本。在仓库根目录运行：
+
+```sh
+moon update
+moon run console --target js -- network-audit ref captures/clock-network/chain.csv 10 50
+moon run console --target js -- network-apply ref captures/clock-network/chain.csv captures/clock-network/events.csv 10 50
+moon run console --target js -- network-audit ref captures/clock-network/conflict.csv 10 50
+```
+
+同步链样例中，传感器读数 1000000 µs 经网关换算为 1201000 µs。超出路径支持区间的记录标记为 `extrapolated`，已知但无法连到参考时钟的记录标记为 `disconnected` 并留空参考时间。冲突样例中，三条边各自均无剔除点，路径审计仍发现约 500 µs 的差值，并阻止导出。样例是合成数据。 [复现实验与预期输出](captures/clock-network/README.md)
+
+链接表使用 `from,to,from_us,to_us`，相同有向时钟对的记录组成一条边，每边至少提供两个匹配事件。采集表以 `clock,device_us` 开头，其余列原样保留。用不同 ID 表示同一设备重启前后的会话。两个可选参数依次为边拟合残差阈值和路径冲突阈值，单位为微秒，默认均为 1000。
+
+每条边先独立拟合仿射映射。求解器选择最少跳路径，同跳数按输入边顺序处理。逆向边使用解析逆映射及该方向保留锚点的观测区间。组合时将下一边的覆盖区间拉回当前坐标系，取沿途交集，最后输出时才取整。
+
+对参考时钟所在分量的非树边，求解器在两条路线的共同覆盖区间内比较映射。仿射差的绝对值在区间端点之一取最大值。无正长度共同区间时标为 `no_shared_coverage`，该边无法验证。确认的冲突会使 `network-apply` 退出 1，并保持标准输出为空。审计不自动归责，树形图也没有冗余证据可用于检查路径一致性。
+
+当前最多支持 64 个设备会话、256 条链路和每条链路 256 个匹配事件，输入是已配对的事件。不同分量需分别选择参考时钟进行审计。路径的支持区间表示观测范围，不代表误差置信区间。 [可执行图 API 示例](network/README.mbt.md)
+
+## 双设备拟合与原台架
 
 准备 [MoonBit](https://www.moonbitlang.cn/download/)（本轮验证版本为 moonc 0.10.19）与 Node.js 22 或更新版本。以下命令在仓库根目录执行。先审计拟合，再生成校准记录，最后用留出事件比较误差。
 
@@ -54,8 +73,9 @@ moon run console --target js -- score captures/bench-pulse/fit.csv captures/benc
 | 路径 | 内容 |
 | --- | --- |
 | [calibration/](calibration/) | 无文件依赖的时钟拟合、映射和证据 API |
-| [console/](console/) | CSV 读写、Node.js 命令行及留出误差评分 |
-| [captures/](captures/) | 实验记录和可复现的台架数据 |
+| [network/](network/) | 双向时钟图、路径覆盖与冗余边审计 |
+| [console/](console/) | CSV 读写、Node.js 命令行、图审计与留出误差评分 |
+| [captures/](captures/) | 双设备和图场景的复现实验 |
 
 ```sh
 moon check --deny-warn
@@ -69,6 +89,6 @@ moon fmt --check
 代码采用 [MIT](LICENSE) 许可。命令行通过 [moonbitlang/x](https://github.com/moonbitlang/x) 读取文件。
 算法采用 Theil–Sen 斜率中位数与普通最小二乘。样例由本项目按公开公式构造。相近的 MoonBit 项目 [warpfit](https://github.com/JQ-ai-nb/warpfit) 处理可微时序对齐，本项目以配对同步事件校准设备时钟并记录证据。
 
-参赛材料见 [项目申报书](SUBMISSION.md) 和 [初审提交清单](REVIEW.md)。
+复审材料见 [项目事实底稿](SUBMISSION.md) 和 [核对记录](REVIEW.md)。
 
 第三方许可、样例来源和同类比较见 [THIRD_PARTY.md](THIRD_PARTY.md)。

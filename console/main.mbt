@@ -4,6 +4,8 @@ let usage : String =
   #|  audit ANCHORS.csv [TOLERANCE_US]
   #|  apply ANCHORS.csv CAPTURE.csv [TOLERANCE_US]
   #|  score ANCHORS.csv HOLDOUT.csv [TOLERANCE_US]
+  #|  network-audit REFERENCE LINKS.csv [FIT_US [CYCLE_US]]
+  #|  network-apply REFERENCE LINKS.csv CAPTURE.csv [FIT_US [CYCLE_US]]
   #|Append --min-span-us N to require a minimum accepted anchor span.
   #|Default residual tolerance is 1000 microseconds.
   #|audit and score write JSON. apply writes CSV to standard output.
@@ -62,6 +64,14 @@ fn run(args : ArrayView[String]) -> Unit raise {
     ["apply", anchors, capture, .. rest] => {
       let (result, _) = fit_file(anchors, rest)
       stdout(project_capture(read_input(capture), result.clock))
+    }
+    ["network-audit", reference, links, .. rest] => {
+      let (result, cycle_tol) = solve_network(reference, links, rest)
+      println(network_audit(result, cycle_tol).stringify())
+    }
+    ["network-apply", reference, links, capture, .. rest] => {
+      let (result, _) = solve_network(reference, links, rest)
+      stdout(network_capture(read_input(capture), result))
     }
     ["score", anchors, holdout, .. rest] => {
       let (result, _) = fit_file(anchors, rest)

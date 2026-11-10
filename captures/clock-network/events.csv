@@ -1,0 +1,6 @@
+clock,device_us,measurement
+sensor,1000000,21.8
+gateway,1001100,pulse
+sensor,2000000,22.1
+offline,100000,offline reading
+ref,0,start

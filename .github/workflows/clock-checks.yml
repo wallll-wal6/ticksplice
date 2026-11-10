@@ -31,7 +31,7 @@ jobs:
           moon check --target js --deny-warn
           moon test --target js --deny-warn
           moon build console --target js --release
-      - name: Assert the capture replay results
+      - name: Assert pair and network replay results
         run: moon run captures/verify-bench.mbtx --deny-warn
       - name: Check formatting
         run: |

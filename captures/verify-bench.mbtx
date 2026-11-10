@@ -26,6 +26,94 @@ async fn report(args : Array[String]) -> Json {
 }
 
 ///|
+async fn check_network() -> Unit {
+  let chain = "captures/clock-network/chain.csv"
+  let events = "captures/clock-network/events.csv"
+  let audit = report(["network-audit", "ref", chain, "10", "50"])
+  guard audit
+    is {
+      "conflict_count": 0,
+      "disconnected": ["offline", "peer"],
+      "routes": Array(routes),
+      ..
+    } &&
+    routes
+    .iter()
+    .any(route => {
+      route
+      is {
+        "clock": "sensor",
+        "path": ["sensor", "gateway", "ref"],
+        "link_ids": [2, 1],
+        "coverage_us": [0, 1798201],
+        ..
+      }
+    }) else {
+    fail("network audit must expose the two-hop route and its coverage")
+  }
+
+  let (code, rows) = replay(["network-apply", "ref", chain, events, "10", "50"])
+  guard code == 0 &&
+    rows
+    is [
+      "\"clock\",\"device_us\",\"measurement\",\"reference_us\",\"alignment\"",
+      "\"sensor\",\"1000000\",\"21.8\",\"1201000\",\"covered\"",
+      "\"gateway\",\"1001100\",\"pulse\",\"1000000\",\"covered\"",
+      "\"sensor\",\"2000000\",\"22.1\",\"2202000\",\"extrapolated\"",
+      "\"offline\",\"100000\",\"offline reading\",\"\",\"disconnected\"",
+      "\"ref\",\"0\",\"start\",\"0\",\"covered\"",
+    ] else {
+    fail("network apply must preserve input order and annotate each clock")
+  }
+
+  let redundant = report([
+    "network-audit", "ref", "captures/clock-network/consistent.csv", "10", "50",
+  ])
+  guard redundant
+    is {
+      "conflict_count": 0,
+      "cycles": [{ "link_id": 2, "status": "consistent", .. }],
+      ..
+    } else {
+    fail("matching redundant route should pass")
+  }
+
+  let conflict = "captures/clock-network/conflict.csv"
+  let inconsistent = report(["network-audit", "ref", conflict, "10", "50"])
+  guard inconsistent
+    is {
+      "conflict_count": 1,
+      "links": [
+        { "rejected": 0, .. },
+        { "rejected": 0, .. },
+        { "rejected": 0, .. },
+      ],
+      "cycles": [
+        {
+          "link_id": 2,
+          "status": "conflict",
+          "max_gap_us": Number(gap, ..),
+          ..
+        },
+      ],
+      ..
+    } &&
+    (gap - 500.0).abs() < 0.001 else {
+    fail("individually clean fits must expose a 500 us network disagreement")
+  }
+  let (reject_code, output) = replay([
+    "network-apply", "ref", conflict, "captures/clock-network/linked-events.csv",
+    "10", "50",
+  ])
+  guard reject_code == 1 && output.is_empty() else {
+    fail("conflicting network must reject export without writing any CSV")
+  }
+  println(
+    "Network replay passed: multi-hop paths, coverage, and cycle consistency.",
+  )
+}
+
+///|
 async fn main {
   let fit = "captures/bench-pulse/fit.csv"
   let audit = report(["audit", fit, "100", "--min-span-us", "80000000"])
@@ -153,4 +241,5 @@ async fn main {
   println(
     "Three workflows passed: drift, rejected anchor, holdout error, extrapolation and failure exit.",
   )
+  check_network()
 }

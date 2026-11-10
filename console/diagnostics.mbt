@@ -47,6 +47,26 @@ fn diagnostic(error : Error) -> String {
       "the fitted reference clock does not advance"
     @calibration.ProjectionOutOfRange =>
       "a projected timestamp falls outside the supported microsecond range"
+    NetworkConflict(count) =>
+      "network has \{count} conflicting cycle(s); run network-audit"
+    @network.InvalidClock(clock) => "invalid clock ID: \{clock}"
+    @network.MissingReference(clock) => "reference clock \{clock} has no links"
+    @network.SelfLink(id) => "link \{id} connects a clock session to itself"
+    @network.TooManyLinks => "network supports at most 256 links"
+    @network.TooManyClocks => "network supports at most 64 clock sessions"
+    @network.OffsetOnlyLink(id) =>
+      "link \{id} requires at least two matched events"
+    @network.LinkFitFailed(id, cause) => "link \{id}: \{diagnostic(cause)}"
+    @network.InvalidCycleTolerance =>
+      "cycle tolerance must be nonnegative and in the microsecond range"
+    @network.UnknownClock(clock) =>
+      "capture contains unknown clock session \{clock}"
+    @network.InvalidNetworkTimestamp =>
+      "network timestamp is outside the supported microsecond range"
+    @network.UnrepresentableTransform =>
+      "network mapping or projected timestamp is out of range"
+    @network.InconsistentNetwork =>
+      "projection blocked by conflicting clock routes"
     _ => "unexpected failure: \{error}"
   }
 }

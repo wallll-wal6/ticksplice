@@ -1,5 +1,6 @@
 import {
   "wallll-wal6/ticksplice/calibration",
+  "wallll-wal6/ticksplice/network",
   "moonbitlang/core/env",
   "moonbitlang/core/string",
   "moonbitlang/core/encoding/utf8",

@@ -8,7 +8,7 @@ repository = "https://github.com/wallll-wal6/ticksplice"
 
 license = "MIT"
 
-description = "Anchor-based clock calibration for offline device captures"
+description = "Offline device clock graphs with multi-hop alignment and cycle audits"
 
 import {
   "moonbitlang/x@0.5.7",

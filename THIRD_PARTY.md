@@ -13,7 +13,8 @@ Theil–Sen 斜率中位数和普通最小二乘是采用的算法方法，当�
 验收脚本使用的 async 环境会提示实验性依赖，校准库本身没有该依赖。
 
 `captures/bench-pulse`、`captures/logger-pair`、`captures/session-offset` 的数据均为本项目根据文档公式构造，
-采用项目 MIT 许可证。SVG 标识由本项目以矢量代码绘制。`pkg.generated.mbti` 为 MoonBit 编译器生成的 API 摘要。
+采用项目 MIT 许可证。`captures/clock-network` 使用公开于样例说明的仿射公式构造，无真实设备或个人数据。
+SVG 标识由本项目以矢量代码绘制。`pkg.generated.mbti` 为 MoonBit 编译器生成的 API 摘要。
 项目方向和交付要求由参赛者提出，AI 辅助实现、测试和资料整理，人工需要复核算法选择、误差解释和正式申报书。
 
 ## 相近项目与新增价值
@@ -28,3 +29,6 @@ Theil–Sen 斜率中位数和普通最小二乘是采用的算法方法，当�
 
 上述项目用于选题比较，当前代码未导入或复制它们的实现。公开检索无法覆盖尚未公开的参赛项目，
 申报前需再次检查同类包，参赛者应结合实际用户需求说明独立建设的理由。
+
+时钟图与仿射时钟是已有研究主题，相关背景见 [Fundamental Limits on Synchronizing Clocks Over Networks](https://doi.org/10.1109/TAC.2010.2089210)。
+本项目处理离线的已配对事件，提供路径换算、覆盖标记与冗余证据审计。实现未移植该论文或其他同步协议的代码。

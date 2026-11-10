@@ -1,0 +1,9 @@
+from,to,from_us,to_us
+ref,gateway,0,100
+ref,gateway,1000000,1001100
+ref,gateway,2000000,2002100
+sensor,gateway,0,200300
+sensor,gateway,1000000,1202301
+sensor,gateway,2000000,2204302
+offline,peer,0,10
+offline,peer,1000000,1000010

@@ -44,18 +44,7 @@ fn project_capture(
   guard rows is [header, .. records] && header is ["device_us", ..] else {
     raise BadHeader("capture header must start with device_us")
   }
-  let names : Set[String] = Set([])
-  for name in header {
-    if name.is_empty() ||
-      names.contains(name) ||
-      name == "reference_us" ||
-      name == "extrapolated" {
-      raise BadHeader(
-        "capture column names must be unique and cannot be empty or reserved",
-      )
-    }
-    names.add(name)
-  }
+  validate_columns(header, ["reference_us", "extrapolated"])
   let output = StringBuilder()
   write_record(output, [..header, "reference_us", "extrapolated"])
   for i, row in records {
@@ -69,4 +58,20 @@ fn project_capture(
     )
   }
   output.to_string()
+}
+
+///|
+fn validate_columns(
+  header : ArrayView[String],
+  reserved : ArrayView[String],
+) -> Unit raise InputError {
+  let names : Set[String] = Set([])
+  for name in header {
+    if name.is_empty() || names.contains(name) || reserved.contains(name) {
+      raise BadHeader(
+        "capture column names must be unique and cannot be empty or reserved",
+      )
+    }
+    names.add(name)
+  }
 }
